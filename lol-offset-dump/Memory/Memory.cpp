@@ -1,5 +1,4 @@
 #include "Memory.h"
-#include "Sig.h"
 #pragma warning(disable:4996)
 
 CMemory::CMemory()
