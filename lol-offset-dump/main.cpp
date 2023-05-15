@@ -62,7 +62,7 @@ bool ParseFileToStruct(std::vector<PatternStruct> &vector)
 			typeSize = doc.GetCell<__int64>(4, i);   //again... theres no way to check if a cell exists with this library.
 		}
 		catch (std::out_of_range) {
-			typeSize = 0;
+			typeSize = 4;
 		}
 		
 		PatternStruct ps;
