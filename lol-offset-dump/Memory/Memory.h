@@ -5,7 +5,10 @@
 #include <iostream>
 #include <vector>
 #include <ctype.h>
-
+#define COLOR_RED "\033[31m"
+#define COLOR_GREEN "\033[32m"
+#define COLOR_YELLOW "\033[33m"
+#define COLOR_RESET "\033[0m"
 //enum InputType : INT
 //{
 //	TYPE_INVALID,
@@ -25,7 +28,7 @@ enum class InputType
 struct PatternStruct
 {
 	std::string name, pattern;
-	int64_t offset, type_size;
+	int offset, type_size;
 	InputType type;
 };
 

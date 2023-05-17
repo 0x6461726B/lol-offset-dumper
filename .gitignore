@@ -4,3 +4,6 @@
 
 /.vs/lol-offset-dump
 /README.md
+/x64/Release
+/lol-offset-dump/x64/Release
+/retrm

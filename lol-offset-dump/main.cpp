@@ -53,9 +53,15 @@ bool ParseFileToStruct(std::vector<PatternStruct> &vector)
 
 		std::string name = ltrim(doc.GetCell<std::string>(1, i)); //trim space so its not ugly in console
 		std::string pattern = doc.GetCell<std::string>(2, i);
-		int64_t offset = doc.GetCell<__int64>(3, i);
+		int64_t offset;
 		int64_t typeSize;
 		
+		try {
+			offset = doc.GetCell<__int64>(3, i);
+		}
+		catch (std::out_of_range) {
+			offset = 0;
+			}
 		
 
 		try {
@@ -144,7 +150,8 @@ int main(int argc, const char* argv[])
 		output << "#define " << obj.name << " 0x" << std::hex << std::uppercase << address << "\t//" << obj.pattern << std::endl;
 
 		//Print in console
-		std::cout << obj.name << ": 0x" << std::hex << std::uppercase << address << std::endl;
+		printf("%s%s 0x%X\r\n%s", COLOR_GREEN, obj.name.c_str(), address, COLOR_RESET); //abomination but works, tldr: colors text and formats to 7 digit hex
+		
 	}
 
 	//close file

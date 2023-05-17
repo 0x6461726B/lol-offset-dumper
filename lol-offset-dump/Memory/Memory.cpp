@@ -1,6 +1,7 @@
 #include "Memory.h"
 #pragma warning(disable:4996)
 
+
 CMemory::CMemory()
 {
 
@@ -165,13 +166,16 @@ BOOL DataCompare(BYTE* pData, BYTE* bMask,  char* szMask)
 
 int64_t CMemory::findAddress(int64_t dwAddress, int64_t dwLen, BYTE* bMask, char* szMask, InputType dType, int64_t offset)
 {
-	if (bMask[0] == 0xE8)
-		offset = 1;
+	
 
 	for (int64_t i = 0; i < dwLen; i++)
 	{
 		if (DataCompare((BYTE*)(dwAddress + i), bMask, szMask))
 		{
+
+			if (bMask[0] == 0xE8)
+				return (INT)(dwAddress + i + 1) + *(INT*)(dwAddress + i + 1) + sizeof(INT) - (INT)rangeStart;
+
 			switch (dType)
 			{
 			case InputType::Address:
@@ -187,21 +191,25 @@ int64_t CMemory::findAddress(int64_t dwAddress, int64_t dwLen, BYTE* bMask, char
 }
 
 
+constexpr int64_t limit = 0xFFFFFFF;
+
 
 int64_t CMemory::Pattern(PatternStruct Struct)
 {
-	if (!dwFileSize || !rangeStart) 
-		return 0;
-
 	auto ret = IDAToCode(Struct.pattern);
 	
 	
 
-	auto address = findAddress((int64_t)rangeStart, dwFileSize, (BYTE*)ret.first.data(), (char*)ret.second.data(), Struct.type, Struct.offset);
+	auto address = findAddress((int64_t)rangeStart, dwFileSize, ret.first.data(), ret.second.data(), Struct.type, Struct.offset);
 	
-
-	if (Struct.type == InputType::Offset)
-	{
+	
+	if (Struct.type != InputType::Offset) {
+		while (address > limit || address < -0x1) {
+			//printf("%sinvalid address for %s %i %s\n", COLOR_RED, Struct.name, Struct.offset, COLOR_RESET);
+			address = findAddress((int64_t)rangeStart, dwFileSize, ret.first.data(), ret.second.data(), Struct.type, Struct.offset++); //logic: increments offset until it gets an address thats 7 digit, if its higher or lower = incorrect, 
+		}
+	}
+	else {
 		switch (Struct.type_size)
 		{
 		case 1:
