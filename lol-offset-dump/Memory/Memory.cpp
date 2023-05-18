@@ -122,11 +122,6 @@ bool CMemory::Initialize(const char* path_to_exe)
 		return false;
 	}
 	
-
-
-	
-
-
 	hFileMapping = CreateFileMapping(hFileModule, NULL, PAGE_READONLY, 0, 0, NULL);
 
 	if (hFileMapping == 0) {
@@ -225,9 +220,6 @@ int64_t CMemory::findAddress(int64_t dwAddress, int64_t dwLen, BYTE* bMask, char
 				return (INT)(dwAddress + i + offset) - (INT)rangeStart;
 			case InputType::Offset:
 				return dwAddress + i + offset;
-
-			case InputType::Invalid:
-				return (INT)(dwAddress + i + offset) + *(INT*)(dwAddress + i + offset) + sizeof(INT);
 			}
 		}
 	}

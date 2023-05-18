@@ -121,10 +121,6 @@ int main(int argc, const char* argv[])
 	CMemory Memory;
 	std::vector<PatternStruct> pattern_struct;
 	
-
-
-	
-
 	if (argc < 2) {
 		std::cout << "Correct usage: " << argv[0] << " \"League of Legends.exe\"" << std::endl;
 		system("pause");
@@ -141,9 +137,6 @@ int main(int argc, const char* argv[])
 		return 0;
 	}
 
-	
-	
-	
 	//Create output file
 	CreateDumpFile();
 	
