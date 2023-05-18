@@ -119,6 +119,8 @@ int main(int argc, const char* argv[])
 {
 	CMemory Memory;
 	std::vector<PatternStruct> pattern_struct;
+	
+
 
 	if (argc < 2) {
 		std::cout << "Correct usage: " << argv[0] << " \"League of Legends.exe\"" << std::endl;
@@ -141,16 +143,20 @@ int main(int argc, const char* argv[])
 
 	for (auto obj : pattern_struct)
 	{
-
+		auto color = COLOR_GREEN;
 		
 		//Get address from pattern
 		auto address = Memory.Pattern(obj);
+
+		if (!address)
+			color = COLOR_RED;
+
 
 		//Save output in file
 		output << "#define " << obj.name << " 0x" << std::hex << std::uppercase << address << "\t//" << obj.pattern << std::endl;
 
 		//Print in console
-		printf("%s%s 0x%X\r\n%s", COLOR_GREEN, obj.name.c_str(), address, COLOR_RESET); //abomination but works, tldr: colors text and formats to 7 digit hex
+		printf("%s%s 0x%X\r\n%s", color, obj.name.c_str(), address, COLOR_RESET); //abomination but works, tldr: colors text and formats to 7 digit hex
 		
 	}
 

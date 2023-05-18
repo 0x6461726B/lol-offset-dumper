@@ -202,6 +202,10 @@ int64_t CMemory::Pattern(PatternStruct Struct)
 
 	auto address = findAddress((int64_t)rangeStart, dwFileSize, ret.first.data(), ret.second.data(), Struct.type, Struct.offset);
 	
+	if (!address)
+		return 0;
+
+
 	
 	if (Struct.type != InputType::Offset) {
 		while (address > limit || address < -0x1) {
