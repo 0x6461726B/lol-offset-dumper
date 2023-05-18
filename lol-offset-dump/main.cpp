@@ -113,6 +113,7 @@ void CreateDumpFile()
 	output << str_time;
 	output << "*/" << std::endl << std::endl;
 	output << "#define BASEADDRESS GetModuleHandle(NULL)" << std::endl;
+	
 }
 
 int main(int argc, const char* argv[])
@@ -121,6 +122,8 @@ int main(int argc, const char* argv[])
 	std::vector<PatternStruct> pattern_struct;
 	
 
+
+	
 
 	if (argc < 2) {
 		std::cout << "Correct usage: " << argv[0] << " \"League of Legends.exe\"" << std::endl;
@@ -138,8 +141,13 @@ int main(int argc, const char* argv[])
 		return 0;
 	}
 
+	
+	
+	
 	//Create output file
 	CreateDumpFile();
+	
+	output << "#define Version " << "\"" <<  Memory.getGameVersion() << "\"" << std::endl;
 
 	for (auto obj : pattern_struct)
 	{
