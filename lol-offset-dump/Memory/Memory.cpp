@@ -228,7 +228,8 @@ int64_t CMemory::findAddress(int64_t dwAddress, int64_t dwLen, BYTE* bMask, char
 
 
 constexpr int64_t limit = 0xFFFFFFF;
-
+constexpr int64_t limit2 = 0xFFFFFF;
+constexpr int64_t limit3 = 0xFF;
 
 int64_t CMemory::Pattern(PatternStruct Struct)
 {
@@ -241,30 +242,23 @@ int64_t CMemory::Pattern(PatternStruct Struct)
 	if (!address)
 		return 0;
 
-
-	
 	if (Struct.type != InputType::Offset) {
-		while (address > limit || address < -0x1) {
+		while (address > limit || address < -1) {
 			//printf("%sinvalid address for %s %i %s\n", COLOR_RED, Struct.name, Struct.offset, COLOR_RESET);
 			address = findAddress((int64_t)rangeStart, dwFileSize, ret.first.data(), ret.second.data(), Struct.type, Struct.offset++); //logic: increments offset until it gets an address thats 7 digit, if its higher or lower = incorrect, 
 		}
 	}
 	else {
-		switch (Struct.type_size)
-		{
-		case 1:
-			address = *(int8_t*)address;
-			break;
-		case 2:
-			address = *(int16_t*)address;
-			break;
-		case 4:
-			address = *(int32_t*)address;
-			break;
-		}
-	}
 
-	
+     	if (*(int32_t*)address < limit2 && *(int32_t*)address > -1)
+			address = *(int32_t*)address;
+
+		else if (*(int8_t*)address < limit3 && *(int8_t*)address > -1)
+			address = *(int8_t*)address;
+		else
+			address = 0;
+
+	}
 	return address;
 }
 

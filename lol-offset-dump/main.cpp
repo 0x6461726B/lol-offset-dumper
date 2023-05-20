@@ -54,7 +54,6 @@ bool ParseFileToStruct(std::vector<PatternStruct> &vector)
 		std::string name = ltrim(doc.GetCell<std::string>(1, i)); //trim space so its not ugly in console
 		std::string pattern = doc.GetCell<std::string>(2, i);
 		int64_t offset;
-		int64_t typeSize;
 		
 		try {
 			offset = doc.GetCell<__int64>(3, i);
@@ -62,17 +61,8 @@ bool ParseFileToStruct(std::vector<PatternStruct> &vector)
 		catch (std::out_of_range) {
 			offset = 0;
 			}
-		
 
-		try {
-			typeSize = doc.GetCell<__int64>(4, i);   //again... theres no way to check if a cell exists with this library.
-		}
-		catch (std::out_of_range) {
-			typeSize = 4;
-		}
-		
 		PatternStruct ps;
-		ps.type_size = typeSize;
 		ps.name = name;
 		ps.pattern = pattern;
 		ps.offset = offset;

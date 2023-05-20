@@ -31,7 +31,7 @@ enum class InputType
 struct PatternStruct
 {
 	std::string name, pattern;
-	int offset, type_size;
+	int offset;
 	InputType type;
 };
 
