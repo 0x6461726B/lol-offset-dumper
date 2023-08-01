@@ -53,14 +53,16 @@ bool ParseFileToStruct(std::vector<PatternStruct> &vector)
 
 		std::string name = ltrim(doc.GetCell<std::string>(1, i)); //trim space so its not ugly in console
 		std::string pattern = doc.GetCell<std::string>(2, i);
-		int64_t offset;
+
 		
-		try {
-			offset = doc.GetCell<__int64>(3, i);
+		int64_t offset = pattern.find("??"); // calculate the offset to the first ?? in the pattern
+
+		if (offset != std::string::npos) {
+			offset /= 3; // each byte in the pattern is represented by 3 chars ("XX "), so divide by 3
 		}
-		catch (std::out_of_range) {
-			offset = 0;
-			}
+		else {
+			offset = 5;
+		}
 
 		PatternStruct ps;
 		ps.name = name;
