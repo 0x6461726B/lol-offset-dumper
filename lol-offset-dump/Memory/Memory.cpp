@@ -2,10 +2,7 @@
 #pragma warning(disable:4996)
 
 
-CMemory::CMemory()
-{
-
-}
+CMemory::CMemory() {};
 
 CMemory::~CMemory()
 {
@@ -21,7 +18,8 @@ bool CMemory::Initialize(const char* path_to_exe)
 	LPVOID lpFileBase;
 	PIMAGE_DOS_HEADER dosHeader;
 	PIMAGE_NT_HEADERS peHeader;
-	PIMAGE_SECTION_HEADER sectionHeader;
+
+
 	hFileModule = CreateFile(path_to_exe, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (hFileModule == INVALID_HANDLE_VALUE) {
@@ -47,11 +45,8 @@ bool CMemory::Initialize(const char* path_to_exe)
 	}
 	
 	dosHeader = (PIMAGE_DOS_HEADER)lpFileBase;
-
-	if (dosHeader->e_magic == IMAGE_DOS_SIGNATURE)
-	{
+	if (dosHeader->e_magic == IMAGE_DOS_SIGNATURE) {
 		peHeader = (PIMAGE_NT_HEADERS)((uint8_t*)dosHeader + dosHeader->e_lfanew);
-
 		if (peHeader->Signature != IMAGE_NT_SIGNATURE)
 			return false;
 
@@ -59,7 +54,6 @@ bool CMemory::Initialize(const char* path_to_exe)
 	}
 
 	dwFileSize = GetFileSize(hFileModule, nullptr);
-
 	if (dwFileSize == INVALID_FILE_SIZE) {
 		std::cout << "Invalid file size, Error code: " << GetLastError() << std::endl;
 		CloseHandle(hFileModule);
@@ -196,17 +190,16 @@ constexpr int64_t limit = 0xFFFFFFF;
 
 int64_t CMemory::Pattern(PatternStruct Struct)
 {
-	auto ret = IDAToCode(Struct.pattern);
+	auto [byteVector, maskStr] = IDAToCode(Struct.pattern);
 	
 	
 
-	auto address = findAddress((int64_t)rangeStart, dwFileSize, ret.first.data(), ret.second.data(), Struct.type, Struct.offset);
+	auto address = findAddress((int64_t)rangeStart, dwFileSize, byteVector.data(), maskStr.data(), Struct.type, Struct.offset);
 	
 	
 	if (Struct.type != InputType::Offset) {
 		while (address > limit || address < -0x1) {
-			//printf("%sinvalid address for %s %i %s\n", COLOR_RED, Struct.name, Struct.offset, COLOR_RESET);
-			address = findAddress((int64_t)rangeStart, dwFileSize, ret.first.data(), ret.second.data(), Struct.type, Struct.offset++); //logic: increments offset until it gets an address thats 7 digit, if its higher or lower = incorrect, 
+			address = findAddress((int64_t)rangeStart, dwFileSize, byteVector.data(), maskStr.data(), Struct.type, Struct.offset++); //logic: increments offset until it gets an address thats 7 digit, if its higher or lower = incorrect, 
 		}
 	}
 	else {
