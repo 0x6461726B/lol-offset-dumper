@@ -76,6 +76,10 @@ bool CMemory::Initialize(const char* path_to_exe)
 		return false;
 	}
 
+	
+	gameVersion = getGameVersion(path_to_exe);
+
+	
 	CloseHandle(hFileModule);
 
 	return (dwBytesRead > 0);
@@ -219,4 +223,45 @@ int64_t CMemory::Pattern(PatternStruct Struct)
 
 	
 	return address;
+}
+
+
+std::string CMemory::getGameVersion(const char* path) {
+	DWORD verHandle = NULL;
+	UINT size = 0;
+	LPBYTE lpBuffer = NULL;
+	DWORD verSize = GetFileVersionInfoSize(path, &verHandle);
+
+	if (verSize != NULL) {
+		LPSTR verData = new char[verSize];
+
+		if (GetFileVersionInfo(path, verHandle, verSize, verData)) {
+			if (VerQueryValue(verData, "\\", (VOID FAR * FAR*) & lpBuffer, &size)) {
+				if (size) {
+					VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
+					if (verInfo->dwSignature == 0xfeef04bd) {
+						// You can retrieve the major, minor, build, and revision versions like this:
+						int major = (verInfo->dwFileVersionMS >> 16) & 0xffff;
+						int minor = (verInfo->dwFileVersionMS >> 0) & 0xffff;
+						int build = (verInfo->dwFileVersionLS >> 16) & 0xffff;
+						int revision = (verInfo->dwFileVersionLS >> 0) & 0xffff;
+
+						delete[] verData;
+
+						return std::to_string(major) + "." +
+							std::to_string(minor) + "." +
+							std::to_string(build) + "." +
+							std::to_string(revision);
+					}
+				}
+			}
+		}
+		delete[] verData;
+	}
+	return "Unknown version"; 
+}
+
+
+std::string CMemory::getGameVersionGlobal() {
+	return gameVersion;
 }

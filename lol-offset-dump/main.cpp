@@ -109,6 +109,7 @@ void CreateDumpFile()
 		<< str_time
 		<< "*/" << std::endl << std::endl
 		<< "#define BASEADDRESS GetModuleHandle(NULL)" << std::endl;
+	    
 }
 
 int main(int argc, const char* argv[])
@@ -130,6 +131,8 @@ int main(int argc, const char* argv[])
 
 
 	CreateDumpFile();
+
+	output << "#define Version " << "\"" << Memory.getGameVersionGlobal() << "\"" << std::endl;
 
 	std::optional<InputType> previousType;
 	for (auto& obj : pattern_struct) {
