@@ -207,20 +207,24 @@ int64_t CMemory::Pattern(PatternStruct Struct)
 		}
 	}
 	else {
-		switch (Struct.type_size)
-		{
-		case 1:
-			address = *(int8_t*)address;
-			break;
-		case 2:
-			address = *(int16_t*)address;
-			break;
-		case 4:
-			address = *(int32_t*)address;
-			break;
+		if (address != NULL) {
+			switch (Struct.type_size)
+			{
+			case 1:
+				address = *(int8_t*)address;
+				break;
+			case 2:
+				address = *(int16_t*)address;
+				break;
+			case 4:
+				address = *(int32_t*)address;
+				break;
+			}
+		}
+		else {
+			return 0;
 		}
 	}
-
 	
 	return address;
 }
