@@ -7,3 +7,6 @@
 /x64/Release
 /lol-offset-dump/x64/Release
 /retrm
+/x64/Debug
+/lol-offset-dump/x64/Debug
+/lol-offset-dump/lol-offset-dump.vcxproj.user
