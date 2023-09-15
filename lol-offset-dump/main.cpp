@@ -13,6 +13,8 @@
 #define PATTERN_FILE "Patterns.txt"
 #define DUMP_FILE "Offsets.h"
 
+
+
 std::ofstream output;
 
 enum InputFields
@@ -77,16 +79,11 @@ bool ParseFileToStruct(std::vector<PatternStruct> &vector)
 		ps.pattern = pattern;
 		ps.offset = offset;
 		
-	    if (type == "OFFSET") 
-			ps.type = InputType::Offset;
+	    if (type == "OFFSET") ps.type = InputType::Offset;
+		else if (type == "ADDRESS") ps.type = InputType::Address;
+		else if (type == "FUNCTION") ps.type = InputType::AddressFunction;
 		
-		else if (type == "ADDRESS") 
-			ps.type = InputType::Address;
-		
-		else if (type == "FUNCTION") 
-			ps.type = InputType::AddressFunction;
-		
-		
+
 		vector.push_back(ps);
 	}
 
@@ -95,24 +92,23 @@ bool ParseFileToStruct(std::vector<PatternStruct> &vector)
 
 void CreateDumpFile()
 {
-	//Create file
+	
 	output.open(DUMP_FILE);
 
-	//Get Time Now
+	
 	auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-
-	//Convert time to ctime format
 	char str_time[MAXCHAR];
 	ctime_s(str_time, MAXCHAR, &now);
 
-	//write in file
+	
     
-	output << "#pragma once" << std::endl << std::endl;
-	output << "/*" << std::endl;
-	output << "Original dumper by @Ph4nton (https://www.unknowncheats.me/forum/members/780190.html)\nUpdated by @Dark (https://www.unknowncheats.me/forum/members/1269962.html)" << std::endl;
-	output << str_time;
-	output << "*/" << std::endl << std::endl;
-	output << "#define BASEADDRESS GetModuleHandle(NULL)" << std::endl;
+	output << "#pragma once" << std::endl << std::endl
+		<< "/*" << std::endl
+		<< "Original dumper by @Ph4nton (https://www.unknowncheats.me/forum/members/780190.html)\n"
+		<< "Updated by @Dark (https://www.unknowncheats.me/forum/members/1269962.html)" << std::endl
+		<< str_time
+		<< "*/" << std::endl << std::endl
+		<< "#define BASEADDRESS GetModuleHandle(NULL)" << std::endl;
 }
 
 int main(int argc, const char* argv[])
@@ -126,38 +122,42 @@ int main(int argc, const char* argv[])
 		return 0;
 	}
 	
-	if (!ParseFileToStruct(pattern_struct)) {
+	if (!ParseFileToStruct(pattern_struct) || !Memory.Initialize(argv[1])) {
 		system("pause");
 		return 0;
 	}
 
-	if (!Memory.Initialize(argv[1])) {
-		system("pause");
-		return 0;
-	}
 
-	//Create output file
+
 	CreateDumpFile();
 
-	for (auto obj : pattern_struct)
-	{
+	std::optional<InputType> previousType;
+	for (auto& obj : pattern_struct) {
+		auto type = obj.type;
+		if (!previousType.has_value() || type != *previousType) {
+			if (type == InputType::Address) {
+				output << "//---Addresses---" << std::endl;
+				printf("%s ---Addresses--- %s\n", COLOR_BLUE, COLOR_RESET);
+			}
+			else if (type == InputType::AddressFunction) {
+				output << "//---Functions---" << std::endl;
+				printf("%s ---Functions--- %s\n", COLOR_BLUE, COLOR_RESET);
+			}
+			else if (type == InputType::Offset) {
+				output << "//---Offsets---" << std::endl;
+				printf("%s ---Offsets--- %s\n", COLOR_BLUE, COLOR_RESET);
+			}
+			previousType = type;
+		}
 
-		
-		//Get address from pattern
 		auto address = Memory.Pattern(obj);
-
-		//Save output in file
+		auto color = (address == 0x0) ? COLOR_RED : COLOR_GREEN;
 		output << "#define " << obj.name << " 0x" << std::hex << std::uppercase << address << "\t//" << obj.pattern << std::endl;
-
-		//Print in console
-		printf("%s%s 0x%X\r\n%s", COLOR_GREEN, obj.name.c_str(), address, COLOR_RESET); //abomination but works, tldr: colors text and formats to 7 digit hex
-		
+		printf("%s%s 0x%X\r\n%s", color, obj.name.c_str(), address, COLOR_RESET);
 	}
 
-	//close file
+	
 	output.close();
-
 	system("pause");
-
 	return 0;
 }
